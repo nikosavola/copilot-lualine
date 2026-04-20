@@ -48,7 +48,7 @@ component.is_error = function()
     end
 
     local data = s.data.status
-    if data == 'Warning' then
+    if data == "Warning" then
         return true
     end
 
@@ -67,7 +67,7 @@ component.is_loading = function()
     end
 
     local data = s.data.status
-    if data == 'InProgress' then
+    if data == "InProgress" then
         return true
     end
 
