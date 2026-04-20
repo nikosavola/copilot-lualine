@@ -1,0 +1,232 @@
+*copilot-lualine.txt*    Copilot status component for lualine.nvim
+
+Author: Andre Mossi
+License: MIT
+Homepage: https://github.com/AndreM222/copilot-lualine
+
+==============================================================================
+CONTENTS                                            *copilot-lualine-contents*
+
+    1. Introduction ........................ |copilot-lualine-introduction|
+    2. Requirements ........................ |copilot-lualine-requirements|
+    3. Installation ........................ |copilot-lualine-installation|
+    4. Setup ............................... |copilot-lualine-setup|
+    5. Configuration ....................... |copilot-lualine-configuration|
+    6. Colors .............................. |copilot-lualine-colors|
+    7. Spinners ............................ |copilot-lualine-spinners|
+    8. API ................................. |copilot-lualine-api|
+
+==============================================================================
+1. INTRODUCTION                                 *copilot-lualine-introduction*
+
+copilot-lualine is a lualine.nvim component that displays the current status
+of copilot.lua in your statusline. It shows whether Copilot is enabled,
+sleeping (auto-trigger disabled), disabled, loading, in a warning state, or
+in an unknown state—each with configurable icons and colors.
+
+==============================================================================
+2. REQUIREMENTS                                 *copilot-lualine-requirements*
+
+- Neovim >= 0.9.0
+- lualine.nvim (https://github.com/nvim-lualine/lualine.nvim)
+- copilot.lua  (https://github.com/zbirenbaum/copilot.lua)
+- A Nerd Font (for default icons)
+
+==============================================================================
+3. INSTALLATION                                 *copilot-lualine-installation*
+
+Using lazy.nvim: >lua
+    { "AndreM222/copilot-lualine" }
+<
+Using packer.nvim: >lua
+    use "AndreM222/copilot-lualine"
+<
+Using vim-plug: >vim
+    Plug 'AndreM222/copilot-lualine'
+<
+
+==============================================================================
+4. SETUP                                               *copilot-lualine-setup*
+
+Add the `copilot` component to one of your lualine sections: >lua
+
+    require("lualine").setup({
+        sections = {
+            lualine_x = { "copilot", "encoding", "fileformat", "filetype" },
+        },
+    })
+<
+
+==============================================================================
+5. CONFIGURATION                               *copilot-lualine-configuration*
+
+The component accepts the following options with their defaults: >lua
+
+    {
+        "copilot",
+        symbols = {
+            status = {
+                icons = {
+                    enabled = " ",
+                    sleep = " ",       -- auto-trigger disabled
+                    disabled = " ",
+                    warning = " ",
+                    unknown = " ",
+                },
+                hl = {
+                    enabled = "#50FA7B",
+                    sleep = "#AEB7D0",
+                    disabled = "#6272A4",
+                    warning = "#FFB86C",
+                    unknown = "#FF5555",
+                },
+            },
+            spinners = "dots",          -- spinner name or custom table
+            spinner_color = "#6272A4",
+        },
+        show_colors = false,
+        show_loading = true,
+    }
+<
+
+                                                *copilot-lualine-show_colors*
+show_colors ~
+    Type: boolean, Default: `false`
+    When `true`, applies highlight colors to the status icons.
+
+                                               *copilot-lualine-show_loading*
+show_loading ~
+    Type: boolean, Default: `true`
+    When `true`, displays an animated spinner while Copilot is processing.
+
+                                                   *copilot-lualine-symbols*
+symbols.status.icons ~
+    A table mapping each Copilot state to an icon string.
+
+symbols.status.hl ~
+    A table mapping each Copilot state to a hex color string.
+
+symbols.spinners ~
+    Either a string naming a built-in spinner (e.g., `"dots"`) or a table
+    of strings for a custom spinner animation.
+
+symbols.spinner_color ~
+    A hex color string for the loading spinner.
+
+==============================================================================
+6. COLORS                                             *copilot-lualine-colors*
+
+The `copilot-lualine.colors` module provides helper functions for working
+with highlight group colors.
+
+                                        *copilot-lualine.colors.get_hl_value*
+colors.get_hl_value({ns_id}, {hl_group}, {value})
+
+    Retrieve a color value from a Neovim highlight group.
+
+    Parameters: ~
+        {ns_id}     (number)  Namespace ID (use `0` for global)
+        {hl_group}  (string)  Name of the highlight group
+        {value}     (string)  One of `"fg"`, `"bg"`, `"sp"`, or any
+                              highlight attribute name
+
+    Returns: ~
+        (string|nil) Hex color string like `"#RRGGBB"`, or `nil`
+
+    Example: >lua
+        local colors = require("copilot-lualine.colors")
+        local warn_fg = colors.get_hl_value(0, "DiagnosticWarn", "fg")
+<
+
+                                        *copilot-lualine.colors.name_to_hex*
+colors.name_to_hex({name})
+
+    Convert a named color (e.g., `"red"`, `"NvimDarkBlue"`) to its hex
+    representation. Supports standard Vim color names and Neovim default
+    colorscheme names.
+
+    Parameters: ~
+        {name}  (string)  Color name (case-insensitive)
+
+    Returns: ~
+        (string|nil) Hex color string or `nil` if not found
+
+                                          *copilot-lualine.colors.num_to_hex*
+colors.num_to_hex({num})
+
+    Convert a numeric color value to a hex string.
+
+    Parameters: ~
+        {num}  (number|nil)  Numeric color value
+
+    Returns: ~
+        (string|nil) Hex color string like `"#RRGGBB"`, or `nil`
+
+==============================================================================
+7. SPINNERS                                         *copilot-lualine-spinners*
+
+Built-in spinner animations available via the `spinners` option:
+
+    `"dots"`              Braille dot rotation
+    `"dots_negative"`     Inverted braille dots
+    `"dots_snake"`        Snake-like braille pattern
+    `"dots_footsteps"`    Footstep-like braille pattern
+    `"dots_hop"`          Hopping braille dots
+    `"dots_ellipsis"`     Animated ellipsis
+    `"dots_scrolling"`    Scrolling ellipsis
+    `"dots_bounce"`       Bouncing braille dot
+    `"dots_pulse"`        Pulsing dot pattern
+    `"dots_toggle"`       Toggling dot symbols
+    `"line"`              Rotating line
+    `"pipe"`              Rotating pipe corners
+    `"star"`              Star animation
+    `"flip"`              Flipping characters
+    `"hamburger"`         Hamburger trigrams
+    `"grow_vertical"`     Growing vertical bar
+    `"grow_horizontal"`   Growing horizontal bar
+    `"noise"`             Block noise pattern
+    `"triangle"`          Rotating triangle
+    `"arc"`               Arc animation
+    `"circle"`            Circle animation
+    `"square_corners"`    Rotating square corners
+    `"circle_quarters"`   Rotating circle quarters
+    `"circle_halves"`     Rotating circle halves
+    `"box_toggle"`        Toggling box symbols
+    `"arrow"`             Rotating arrow
+    `"zip"`               Arrow zip animation
+    `"bouncing_bar"`      Bouncing progress bar
+    `"bouncing_ball"`     Bouncing ball animation
+    `"clock"`             Clock emoji animation
+    `"earth"`             Earth emoji rotation
+    `"moon"`              Moon phase animation
+    `"meter"`             Progress meter animation
+
+Custom spinners can be provided as a table of strings: >lua
+    spinners = { "✶", "✸", "✹", "✺", "✹", "✷" }
+<
+
+==============================================================================
+8. API                                                   *copilot-lualine-api*
+
+The `copilot-lualine` module exposes the following functions that can be
+used programmatically:
+
+                                             *copilot-lualine.is_enabled()*
+is_enabled()
+    Returns `true` if Copilot is enabled and attached to the current buffer.
+
+                                              *copilot-lualine.is_error()*
+is_error()
+    Returns `true` if Copilot reports a warning/error status.
+
+                                            *copilot-lualine.is_loading()*
+is_loading()
+    Returns `true` if Copilot is currently processing (InProgress).
+
+                                              *copilot-lualine.is_sleep()*
+is_sleep()
+    Returns `true` if Copilot auto-trigger is disabled for the current
+    buffer (sleep mode).
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:

@@ -1,5 +1,11 @@
+--- Color utility functions for copilot-lualine.
+---@module "copilot-lualine.colors"
 local colors = {}
 
+--- Convert a named color to its hex representation.
+--- Supports standard Vim color names and Neovim default colorscheme names.
+---@param name string Color name (case-insensitive), e.g. "red", "NvimDarkBlue"
+---@return string|nil hex Hex color string like "#RRGGBB", or nil if not found
 colors.name_to_hex = function(name)
     local lookup = {
         ["red"] = "#FF0000",
@@ -70,6 +76,9 @@ colors.name_to_hex = function(name)
     return lookup[string.lower(name)] or lookup_nvim[string.lower(name)]
 end
 
+--- Convert a numeric color value to a hex string.
+---@param num number|nil Numeric color value
+---@return string|nil hex Hex color string like "#RRGGBB", or nil
 colors.num_to_hex = function(num)
     if not num then
         return
@@ -82,6 +91,11 @@ colors.num_to_hex = function(num)
     end
 end
 
+--- Retrieve a color or attribute value from a Neovim highlight group.
+---@param ns_id number Namespace ID (use 0 for global)
+---@param hl_group string Name of the highlight group
+---@param value string One of "fg", "bg", "sp", or any highlight attribute name
+---@return string|boolean|nil result Hex color string, attribute value, or nil
 colors.get_hl_value = function(ns_id, hl_group, value)
     if vim.fn.hlexists(hl_group) == 0 then
         return
