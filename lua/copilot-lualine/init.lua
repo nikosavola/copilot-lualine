@@ -1,8 +1,13 @@
+--- Copilot status checking functions for copilot-lualine.
+--- Provides functions to query the current state of copilot.lua.
+---@module "copilot-lualine"
 local component = {}
 local blinkStatus, _ = pcall(require, "blink-cmp-copilot")
 
--- From TJDevries
--- https://github.com/tjdevries/lazy-require.nvim
+--- Lazy-load a module to avoid blocking Neovim startup.
+--- Credit: TJDevries (https://github.com/tjdevries/lazy-require.nvim)
+---@param require_path string The module path to lazy-load
+---@return table proxy A proxy table that loads the module on first access
 local function lazy_require(require_path)
     return setmetatable({}, {
         __index = function(_, key)
@@ -18,11 +23,13 @@ end
 local c = lazy_require("copilot.client")
 local s = lazy_require("copilot.status")
 
+--- Check if the Copilot LSP client is attached to the current buffer.
+---@return boolean
 local is_current_buffer_attached = function()
     return c.buf_is_attached(vim.api.nvim_get_current_buf())
 end
 
----Check if copilot is enabled
+--- Check if Copilot is enabled and attached to the current buffer.
 ---@return boolean
 component.is_enabled = function()
     if c.is_disabled() then
@@ -36,7 +43,7 @@ component.is_enabled = function()
     return true
 end
 
----Check if copilot is online
+--- Check if Copilot reports a warning/error status.
 ---@return boolean
 component.is_error = function()
     if c.is_disabled() then
@@ -48,14 +55,14 @@ component.is_error = function()
     end
 
     local data = s.data.status
-    if data == 'Warning' then
+    if data == "Warning" then
         return true
     end
 
     return false
 end
 
----Show copilot running status
+--- Check if Copilot is currently processing a suggestion (InProgress).
 ---@return boolean
 component.is_loading = function()
     if c.is_disabled() then
@@ -67,14 +74,14 @@ component.is_loading = function()
     end
 
     local data = s.data.status
-    if data == 'InProgress' then
+    if data == "InProgress" then
         return true
     end
 
     return false
 end
 
----Check auto trigger suggestions
+--- Check if Copilot auto-trigger is disabled (sleep mode) for the current buffer.
 ---@return boolean
 component.is_sleep = function()
     if c.is_disabled() then
